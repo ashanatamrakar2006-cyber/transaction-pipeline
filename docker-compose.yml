@@ -1,0 +1,46 @@
+services:
+  api:
+    build: .
+    ports:
+      - "8000:8000"
+    environment:
+      - DATABASE_URL=postgresql://postgres:password@db:5432/transaction_db
+      - GEMINI_API_KEY=AQ.Ab8RN6LSWmtutZ2q8WRzTZV_2NyCDCLsoNrYj47I2Gm8fgHwhA
+    depends_on:
+      - db
+      - redis
+    restart: always
+    volumes:
+      - ./uploads:/app/uploads
+
+  worker:
+    build: .
+    command: celery -A app.tasks.celery_app worker --loglevel=info
+    environment:
+      - DATABASE_URL=postgresql://postgres:password@db:5432/transaction_db
+      - GEMINI_API_KEY=AQ.Ab8RN6LSWmtutZ2q8WRzTZV_2NyCDCLsoNrYj47I2Gm8fgHwhA
+    depends_on:
+      - db
+      - redis
+    restart: always
+    volumes:
+      - ./uploads:/app/uploads
+
+  db:
+    image: postgres:15
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: transaction_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  redis:
+    image: redis:alpine
+    ports:
+      - "6379:6379"
+
+volumes:
+  postgres_data:
