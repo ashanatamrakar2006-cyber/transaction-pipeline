@@ -5,7 +5,7 @@ services:
       - "8000:8000"
     environment:
       - DATABASE_URL=postgresql://postgres:password@db:5432/transaction_db
-      - GEMINI_API_KEY=AQ.Ab8RN6LSWmtutZ2q8WRzTZV_2NyCDCLsoNrYj47I2Gm8fgHwhA
+      - - GEMINI_API_KEY=${GEMINI_API_KEY}
     depends_on:
       - db
       - redis
